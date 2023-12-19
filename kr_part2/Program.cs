@@ -16,7 +16,19 @@ namespace kr_part2
             Point g = new Point('g');
             Make_Connections(a, b, c, d, f, g);
             List<Point> points = new List<Point> { a, b, c, d, f, g };
-            foreach (var point in points) Do(a, b, c, d, f, g, point);
+            foreach (var point in points)
+            {
+                if (point.pointname == 'b')
+                {
+                    //c.Make_connection(b, 5, g, 8, d, 8);
+                    Do(a, b, c, d, f, g, point);
+                    c.Make_connection(b, 5, null, 0, d, 8);
+                    Do(a, b, c, d, f, g, point);
+                    Make_Connections(a, b, c, d, f, g);
+                    continue;
+                }
+                Do(a, b, c, d, f, g, point);
+            }
         }
 
         public static void Make_Connections(Point a, Point b, Point c, Point d, Point f, Point g)
