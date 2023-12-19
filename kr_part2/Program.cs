@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace kr_part2
 {
@@ -16,23 +14,25 @@ namespace kr_part2
             Point d = new Point('d');
             Point f = new Point('f');
             Point g = new Point('g');
+            Make_Connections(a, b, c, d, f, g);
+            List<Point> points = new List<Point> { a, b, c, d, f, g };
+            foreach (var point in points) Do(a, b, c, d, f, g, point);
+        }
+
+        public static void Make_Connections(Point a, Point b, Point c, Point d, Point f, Point g)
+        {
             a.Make_connection(b, 3, g, 8, f, 1);
             b.Make_connection(a, 8, g, 7, c, 1);
             c.Make_connection(b, 5, g, 8, d, 8);
             d.Make_connection(c, 4, g, 5, f, 7);
             f.Make_connection(d, 3, g, 4, a, 8);
             g.Make_connection(a, 4, b, 3, c, 1, d, 8, f, 7);
-
-            Console.WriteLine();
-            Do(a, b, c, d, f, g);
-
         }
 
-        public static void Do(Point a, Point b, Point c, Point d, Point f, Point g) 
+        public static void Do(Point a, Point b, Point c, Point d, Point f, Point g, Point pnt) 
         {
             List<Point> points = new List<Point> { a, b, c, d, f, g };
-            foreach (Point pnt in points)
-            {
+
                 Console.Write("{0}: ", pnt.pointname);
                 Point cur = pnt;
                 int way = 0;
@@ -68,7 +68,7 @@ namespace kr_part2
                         {
                             Console.Write(pnt.pointname);
                             way += lens_all.ElementAt(list_all.IndexOf(pnt));
-                            Console.Write(" {0}", way);
+                            Console.Write(" Длина пути: {0}", way);
                         }
                         else
                         {
@@ -78,9 +78,14 @@ namespace kr_part2
                         break;
                     }
                     way += min;
-                }
-                Console.WriteLine();
             }
+            Console.WriteLine();
+        }
+
+        public int rep_nums(Point p)
+        {
+            int k = 0;
+            return k;
         }
 
     }
