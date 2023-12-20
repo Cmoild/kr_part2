@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
+
 
 namespace kr_part2
 {
@@ -20,24 +19,10 @@ namespace kr_part2
             Point g = new Point('g');
             Make_Connections(a, b, c, d, f, g);
             List<Point> points = new List<Point> { a, b, c, d, f, g };
-            /*
+            //TODO: длины путей
             foreach (var point in points)
             {
-                if (point.pointname == 'b')
-                {
-                    //c.Make_connection(b, 5, g, 8, d, 8);
-                    Do(a, b, c, d, f, g, point);
-                    c.Make_connection(b, 5, null, 0, d, 8);
-                    Do(a, b, c, d, f, g, point);
-                    Make_Connections(a, b, c, d, f, g);
-                    continue;
-                }
-                Do(a, b, c, d, f, g, point);
-            }
-            */
-            //public static Point _st_;
-            foreach (var point in points)
-            {
+                Console.WriteLine("{");
                 Point p = point;
                 _st_ = point;
                 ref Point cur = ref p;
@@ -45,6 +30,7 @@ namespace kr_part2
                 int way = 0;
                 Do(a, b, c, d, f, g, ref cur, start, ref way);
                 foreach (Point m in points) m.visited = false;
+                Console.WriteLine("}");
             }
         }
 
@@ -56,6 +42,12 @@ namespace kr_part2
             d.Make_connection(c, 4, g, 5, f, 7);
             f.Make_connection(d, 3, g, 4, a, 8);
             g.Make_connection(a, 4, b, 3, c, 1, d, 8, f, 7);
+            a.Make_connection(b, 3, null, 0, f, 1);
+            b.Make_connection(a, 3, g, 3, c, 8);
+            c.Make_connection(b, 3, g, 1, d, 1);
+            d.Make_connection(c, 8, null, 0, f, 1);
+            f.Make_connection(d, 3, null, 0, a, 3);
+            g.Make_connection(a, 3, b, 3, c, 3, d, 5, f, 4);
         }
 
         public static void Do(Point a, Point b, Point c, Point d, Point f, Point g, ref Point pnt, Point start, ref int way)
@@ -122,11 +114,11 @@ namespace kr_part2
             }
             if (k == 0)
             {
-                if (list_all.Contains(start) && _st_ == start)
+                if (list_all.Contains(_st_))
                 {
                     
-                    Console.Write(start.pointname);
-                    way += lens_all.ElementAt(list_all.IndexOf(start));
+                    Console.Write(_st_.pointname);
+                    //way += lens_all.ElementAt(list_all.IndexOf(start));
                     Console.WriteLine(" Длина пути: {0}", way);
                     
                 }
