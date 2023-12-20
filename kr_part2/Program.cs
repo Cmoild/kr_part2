@@ -8,6 +8,7 @@ namespace kr_part2
 {
     internal class Program
     {
+        public static int iter;
         public static Point _st_;
         static void Main(string[] args)
         {
@@ -19,10 +20,10 @@ namespace kr_part2
             Point g = new Point('g');
             Make_Connections(a, b, c, d, f, g);
             List<Point> points = new List<Point> { a, b, c, d, f, g };
-            //TODO: длины путей
             foreach (var point in points)
             {
-                Console.WriteLine("{");
+                iter = 0;
+                Console.WriteLine("Для точки {0}:", point.pointname);
                 Point p = point;
                 _st_ = point;
                 ref Point cur = ref p;
@@ -30,7 +31,6 @@ namespace kr_part2
                 int way = 0;
                 Do(a, b, c, d, f, g, ref cur, start, ref way);
                 foreach (Point m in points) m.visited = false;
-                Console.WriteLine("}");
             }
         }
 
@@ -42,23 +42,20 @@ namespace kr_part2
             d.Make_connection(c, 4, g, 5, f, 7);
             f.Make_connection(d, 3, g, 4, a, 8);
             g.Make_connection(a, 4, b, 3, c, 1, d, 8, f, 7);
-            a.Make_connection(b, 3, null, 0, f, 1);
-            b.Make_connection(a, 3, g, 3, c, 8);
-            c.Make_connection(b, 3, g, 1, d, 1);
-            d.Make_connection(c, 8, null, 0, f, 1);
-            f.Make_connection(d, 3, null, 0, a, 3);
-            g.Make_connection(a, 3, b, 3, c, 3, d, 5, f, 4);
+            //a.Make_connection(b, 3, null, 0, f, 1);
+            //b.Make_connection(a, 3, g, 3, c, 8);
+            //c.Make_connection(b, 3, g, 1, d, 1);
+            //d.Make_connection(c, 8, null, 0, f, 1);
+            //f.Make_connection(d, 3, null, 0, a, 3);
+            //g.Make_connection(a, 3, b, 3, c, 3, d, 5, f, 4);
         }
 
         public static void Do(Point a, Point b, Point c, Point d, Point f, Point g, ref Point pnt, Point start, ref int way)
         {
             List<Point> points = new List<Point> { a, b, c, d, f, g };
 
-            //Console.Write("{0}: ", pnt.pointname);
             Point cur = pnt;
-            //int way = 0;
-            //while (true)
-            //{
+
             Console.Write("{0} -> ", cur.pointname);
             List<Point> list_all = new List<Point> { cur.next1, cur.next2, cur.next3, cur.next4, cur.next5 };
             List<Point> list = list_all.Where(p => p != null).ToList();
@@ -70,9 +67,7 @@ namespace kr_part2
             int k = 0;
             foreach (var nw in NxtAndLen)
             {
-                //Console.WriteLine("{0}, {1}\n", nw.NextPoint.pointname, nw.Len);
                 k++;
-
             }
             cur.visited = true;
             foreach (var nw in NxtAndLen)
@@ -94,22 +89,35 @@ namespace kr_part2
 
             if (mins >= 2)
             {
+                foreach (var nw in NxtAndLen)
+                {
+                    if (nw.Len == min)
+                    {
+                        Console.Write("{0}, ", nw.NextPoint.pointname);
+                    }
+                }
+            }
+
+            if (mins >= 2)
+            {
                 Point st = cur;
+                way += min;
                 int stway = way;
                 foreach (var nw in NxtAndLen)
                 {
                     if (nw.Len == min)
                     {
-                        //min = nw.Len;
+                        way = stway;
                         List<Point> notvisitedpnts = new List<Point> { a, b, c, d, f, g };
                         notvisitedpnts = notvisitedpnts.Where(p => p.visited != true).ToList();
                         cur = nw.NextPoint;
-                        //way += min;
-                        pnt = cur; Console.WriteLine();
+                        pnt = cur;
+                        Console.WriteLine();
                         Do(a, b, c, d, f, g, ref cur, st, ref way);
-                        foreach(var p in notvisitedpnts) { p.visited = false; }
+                        foreach (var p in notvisitedpnts) { p.visited = false; }
                     }
                 }
+                way = 0;
                 return;
             }
             if (k == 0)
@@ -118,7 +126,7 @@ namespace kr_part2
                 {
                     
                     Console.Write(_st_.pointname);
-                    //way += lens_all.ElementAt(list_all.IndexOf(start));
+                    way += lens_all.ElementAt(list_all.IndexOf(_st_));
                     Console.WriteLine(" Длина пути: {0}", way);
                     
                 }
@@ -126,7 +134,6 @@ namespace kr_part2
                 {
                     Console.Write("Невозможно применить метод ближайшего соседа\n");
                 }
-                //foreach (Point p in points) p.visited = false;
                 return;
             }
             way += min;
@@ -134,11 +141,6 @@ namespace kr_part2
             Do(a, b, c, d, f, g, ref cur, start, ref way);
         }
 
-        public int rep_nums(Point p)
-        {
-            int k = 0;
-            return k;
-        }
 
     }
 
