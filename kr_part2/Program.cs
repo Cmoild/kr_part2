@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace kr_part2
 {
     internal class Program
     {
+        public static Point _st_;
         static void Main(string[] args)
         {
             Point a = new Point('a');
@@ -16,7 +20,7 @@ namespace kr_part2
             Point g = new Point('g');
             Make_Connections(a, b, c, d, f, g);
             List<Point> points = new List<Point> { a, b, c, d, f, g };
-            
+            /*
             foreach (var point in points)
             {
                 if (point.pointname == 'b')
@@ -30,13 +34,18 @@ namespace kr_part2
                 }
                 Do(a, b, c, d, f, g, point);
             }
-            
-            //ref Point cur = ref a;
-            //Do(a, b, c, d, f, g,ref cur);
-            //Console.Write(cur.pointname);
-            //Do(a, b, c, d, f, g,ref cur);
-            //Do(a, b, c, d, f, g,ref cur);
-            //Do(a, b, c, d, f, g,ref cur);
+            */
+            //public static Point _st_;
+            foreach (var point in points)
+            {
+                Point p = point;
+                _st_ = point;
+                ref Point cur = ref p;
+                Point start = point;
+                int way = 0;
+                Do(a, b, c, d, f, g, ref cur, start, ref way);
+                foreach (Point m in points) m.visited = false;
+            }
         }
 
         public static void Make_Connections(Point a, Point b, Point c, Point d, Point f, Point g)
@@ -49,59 +58,88 @@ namespace kr_part2
             g.Make_connection(a, 4, b, 3, c, 1, d, 8, f, 7);
         }
 
-        public static void Do(Point a, Point b, Point c, Point d, Point f, Point g,/* ref*/ Point pnt) 
+        public static void Do(Point a, Point b, Point c, Point d, Point f, Point g, ref Point pnt, Point start, ref int way)
         {
             List<Point> points = new List<Point> { a, b, c, d, f, g };
 
-                Console.Write("{0}: ", pnt.pointname);
-                Point cur = pnt;
-                int way = 0;
-                while (true)
-                {
-                    Console.Write("{0} -> ", cur.pointname);
-                    List<Point> list_all = new List<Point> { cur.next1, cur.next2, cur.next3, cur.next4, cur.next5 };
-                    List<Point> list = list_all.Where(p => p != null).ToList();
-                    List<int> lens_all = new List<int> { cur.len1, cur.len2, cur.len3, cur.len4, cur.len5 };
-                    List<int> lens = lens_all.Where(i => i != 0).ToList();
-                    var NxtAndLen = list.Zip(lens, (n, w) => new { NextPoint = n, Len = w });
-                    NxtAndLen = NxtAndLen.Where(p => p.NextPoint.visited != true).ToList();
-                    int min = 100;
-                    int k = 0;
-                    foreach (var nw in NxtAndLen)
-                    {
-                        //Console.WriteLine("{0}, {1}\n", nw.NextPoint.pointname, nw.Len);
-                        k++;
+            //Console.Write("{0}: ", pnt.pointname);
+            Point cur = pnt;
+            //int way = 0;
+            //while (true)
+            //{
+            Console.Write("{0} -> ", cur.pointname);
+            List<Point> list_all = new List<Point> { cur.next1, cur.next2, cur.next3, cur.next4, cur.next5 };
+            List<Point> list = list_all.Where(p => p != null).ToList();
+            List<int> lens_all = new List<int> { cur.len1, cur.len2, cur.len3, cur.len4, cur.len5 };
+            List<int> lens = lens_all.Where(i => i != 0).ToList();
+            var NxtAndLen = list.Zip(lens, (n, w) => new { NextPoint = n, Len = w });
+            NxtAndLen = NxtAndLen.Where(p => p.NextPoint.visited != true).ToList();
+            int min = 100;
+            int k = 0;
+            foreach (var nw in NxtAndLen)
+            {
+                //Console.WriteLine("{0}, {1}\n", nw.NextPoint.pointname, nw.Len);
+                k++;
 
-                    }
-                    cur.visited = true;
-                    foreach (var nw in NxtAndLen)
-                    {
-                        if (nw.Len < min)
-                        {
-                            min = nw.Len;
-                            cur = nw.NextPoint;
-                        }
-                    }
-                    if (k == 0)
-                    {
-                        if (list_all.Contains(pnt))
-                        {
-                            Console.Write(pnt.pointname);
-                            way += lens_all.ElementAt(list_all.IndexOf(pnt));
-                            Console.Write(" Длина пути: {0}", way);
-                        }
-                        else
-                        {
-                            Console.Write("Невозможно применить метод ближайшего соседа");
-                        }
-                        foreach (Point p in points) p.visited = false;
-                        break;
-                    }
-                    way += min;
-            //pnt = cur;
-            //Console.WriteLine(pnt.pointname);
             }
-            Console.WriteLine();
+            cur.visited = true;
+            foreach (var nw in NxtAndLen)
+            {
+                if (nw.Len < min)
+                {
+                    min = nw.Len;
+                    cur = nw.NextPoint;
+                }
+            }
+            int mins = 0;
+            foreach (var nw in NxtAndLen)
+            {
+                if (nw.Len == min)
+                {
+                    mins++;
+                }
+            }
+
+            if (mins >= 2)
+            {
+                Point st = cur;
+                int stway = way;
+                foreach (var nw in NxtAndLen)
+                {
+                    if (nw.Len == min)
+                    {
+                        //min = nw.Len;
+                        List<Point> notvisitedpnts = new List<Point> { a, b, c, d, f, g };
+                        notvisitedpnts = notvisitedpnts.Where(p => p.visited != true).ToList();
+                        cur = nw.NextPoint;
+                        //way += min;
+                        pnt = cur; Console.WriteLine();
+                        Do(a, b, c, d, f, g, ref cur, st, ref way);
+                        foreach(var p in notvisitedpnts) { p.visited = false; }
+                    }
+                }
+                return;
+            }
+            if (k == 0)
+            {
+                if (list_all.Contains(start) && _st_ == start)
+                {
+                    
+                    Console.Write(start.pointname);
+                    way += lens_all.ElementAt(list_all.IndexOf(start));
+                    Console.WriteLine(" Длина пути: {0}", way);
+                    
+                }
+                else
+                {
+                    Console.Write("Невозможно применить метод ближайшего соседа\n");
+                }
+                //foreach (Point p in points) p.visited = false;
+                return;
+            }
+            way += min;
+            pnt = cur;
+            Do(a, b, c, d, f, g, ref cur, start, ref way);
         }
 
         public int rep_nums(Point p)
