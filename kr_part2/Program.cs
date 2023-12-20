@@ -16,6 +16,7 @@ namespace kr_part2
             Point g = new Point('g');
             Make_Connections(a, b, c, d, f, g);
             List<Point> points = new List<Point> { a, b, c, d, f, g };
+            
             foreach (var point in points)
             {
                 if (point.pointname == 'b')
@@ -29,6 +30,13 @@ namespace kr_part2
                 }
                 Do(a, b, c, d, f, g, point);
             }
+            
+            //ref Point cur = ref a;
+            //Do(a, b, c, d, f, g,ref cur);
+            //Console.Write(cur.pointname);
+            //Do(a, b, c, d, f, g,ref cur);
+            //Do(a, b, c, d, f, g,ref cur);
+            //Do(a, b, c, d, f, g,ref cur);
         }
 
         public static void Make_Connections(Point a, Point b, Point c, Point d, Point f, Point g)
@@ -41,7 +49,7 @@ namespace kr_part2
             g.Make_connection(a, 4, b, 3, c, 1, d, 8, f, 7);
         }
 
-        public static void Do(Point a, Point b, Point c, Point d, Point f, Point g, Point pnt) 
+        public static void Do(Point a, Point b, Point c, Point d, Point f, Point g,/* ref*/ Point pnt) 
         {
             List<Point> points = new List<Point> { a, b, c, d, f, g };
 
@@ -90,6 +98,8 @@ namespace kr_part2
                         break;
                     }
                     way += min;
+            //pnt = cur;
+            //Console.WriteLine(pnt.pointname);
             }
             Console.WriteLine();
         }
