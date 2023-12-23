@@ -8,9 +8,11 @@ namespace kr_part2
     internal class Program
     {
         public static int iter;
+        //стартовая точка обхода графа
         public static Point _st_;
         static void Main(string[] args)
         {
+            //инициализируем точки и соединяем их согласно заданию
             Point a = new Point('a');
             Point b = new Point('b');
             Point c = new Point('c');
@@ -21,14 +23,16 @@ namespace kr_part2
             List<Point> points = new List<Point> { a, b, c, d, f, g };
             foreach (var point in points)
             {
+                //обходим граф из каждой точки
                 iter = 0;
                 Console.WriteLine("Для точки {0}:", point.pointname);
                 Point p = point;
                 _st_ = point;
                 ref Point cur = ref p;
-                Point start = point;
-                int way = 0;
+                Point start = point; //текущее начало обхода графа
+                int way = 0; //длина пути
                 Do(a, b, c, d, f, g, ref cur, start, ref way);
+                //изменяем статус точек на "непосещённый"
                 foreach (Point m in points) m.visited = false;
             }
         }
@@ -48,7 +52,7 @@ namespace kr_part2
             //f.Make_connection(d, 3, null, 0, a, 3);
             //g.Make_connection(a, 3, b, 3, c, 3, d, 5, f, 4);
         }
-
+        //реккурентная функция для обхода графа
         public static void Do(Point a, Point b, Point c, Point d, Point f, Point g, ref Point pnt, Point start, ref int way)
         {
             List<Point> points = new List<Point> { a, b, c, d, f, g };
@@ -56,19 +60,25 @@ namespace kr_part2
             Point cur = pnt;
 
             Console.Write("{0} -> ", cur.pointname);
+            
             List<Point> list_all = new List<Point> { cur.next1, cur.next2, cur.next3, cur.next4, cur.next5 };
+            //все следующие точки из данной точки
             List<Point> list = list_all.Where(p => p != null).ToList();
             List<int> lens_all = new List<int> { cur.len1, cur.len2, cur.len3, cur.len4, cur.len5 };
             List<int> lens = lens_all.Where(i => i != 0).ToList();
+            //объединяем списки адреса следующей точки и длин до них, отбрасываем посещённые
             var NxtAndLen = list.Zip(lens, (n, w) => new { NextPoint = n, Len = w });
             NxtAndLen = NxtAndLen.Where(p => p.NextPoint.visited != true).ToList();
             int min = 100;
             int k = 0;
+            //считаем количество непосещенных следующих точек
             foreach (var nw in NxtAndLen)
             {
                 k++;
             }
+            //текущая точка посещена
             cur.visited = true;
+            //минимальный путь до следующей
             foreach (var nw in NxtAndLen)
             {
                 if (nw.Len < min)
@@ -77,6 +87,7 @@ namespace kr_part2
                     cur = nw.NextPoint;
                 }
             }
+            //количество минимальных путей
             int mins = 0;
             foreach (var nw in NxtAndLen)
             {
@@ -85,7 +96,7 @@ namespace kr_part2
                     mins++;
                 }
             }
-
+            //если следующих точек несколько, то пишем их имена
             if (mins >= 2)
             {
                 foreach (var nw in NxtAndLen)
@@ -96,11 +107,12 @@ namespace kr_part2
                     }
                 }
             }
-
+            //если следующих точек несколько, то "разветвляем" наш путь на несколько
             if (mins >= 2)
             {
                 Point st = cur;
                 way += min;
+                //запоминаем путь до разветвления
                 int stway = way;
                 foreach (var nw in NxtAndLen)
                 {
@@ -119,6 +131,9 @@ namespace kr_part2
                 way = 0;
                 return;
             }
+            //если нам некуда идти, то проверяем, можем ли мы попасть в начальную точку
+            //если да, то пишем длину полного пути
+            //если нет, то метод применить невозможно
             if (k == 0)
             {
                 if (list_all.Contains(_st_))
@@ -135,8 +150,11 @@ namespace kr_part2
                 }
                 return;
             }
+            //увеличиваем значение пути
             way += min;
+            //выбираем следующую точку
             pnt = cur;
+            //реккурентно вызываем функцию
             Do(a, b, c, d, f, g, ref cur, start, ref way);
         }
 
@@ -145,6 +163,7 @@ namespace kr_part2
 
     public class Point
     {
+        //у точки есть имя, адреса следующих точек и длины до них
         public char pointname;
         public Point next1;
         public Point next2;
@@ -156,8 +175,9 @@ namespace kr_part2
         public int len3;
         public int len4 = 0;
         public int len5 = 0;
+        //статус посещения точки
         public bool visited = false;
-
+        //для крайних точек. если в какую-либо точку попасть невозможно, то соответствующим аргументам присваевается значение null и 0
         public void Make_connection(Point n1, int l1, Point n2, int l2, Point n3, int l3)
         {
             next1 = n1;
@@ -167,7 +187,7 @@ namespace kr_part2
             len2 = l2;
             len3 = l3;
         }
-
+        //для центральной точки
         public void Make_connection(Point n1, int l1, Point n2, int l2, Point n3, int l3, Point n4, int l4, Point n5, int l5)
         {
             next1 = n1;
